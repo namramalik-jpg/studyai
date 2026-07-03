@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="18" fill="url(#bg)" />
+  <path d="M22 33.5C17.8 32.8 15 29.7 15 25.8C15 21.6 18.4 18.2 22.5 18.2C23.7 14.8 27 12.5 30.8 12.5C35 12.5 38.6 15.4 39.5 19.3C44.8 19.9 49 24.4 49 29.9C49 35.8 44.2 40.5 38.4 40.5H25.8C22.6 40.5 20 37.9 20 34.7C20 34.3 20 33.9 20.1 33.5H22Z" fill="white" fill-opacity="0.95" />
+  <path d="M27 25.5C27 23.8 28.3 22.5 30 22.5H34C35.7 22.5 37 23.8 37 25.5V39C37 41.8 34.8 44 32 44C29.2 44 27 41.8 27 39V25.5Z" fill="url(#brain)" />
+  <path d="M32 23V44M27 31H37M27 36H37" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" />
+  <path d="M46 13L47.7 17.3L52 19L47.7 20.7L46 25L44.3 20.7L40 19L44.3 17.3L46 13Z" fill="#BAE6FD" />
+  <path d="M18 43L19.1 45.9L22 47L19.1 48.1L18 51L16.9 48.1L14 47L16.9 45.9L18 43Z" fill="#DBEAFE" />
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="0.5" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1E3A8A" />
+    </linearGradient>
+    <linearGradient id="brain" x1="27" y1="22.5" x2="39.2" y2="42.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+  </defs>
+</svg>

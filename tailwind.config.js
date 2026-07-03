@@ -1,0 +1,75 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: "class",
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "rgb(var(--study-bg) / <alpha-value>)",
+        sidebar: "rgb(var(--study-sidebar) / <alpha-value>)",
+        card: "rgb(var(--study-card) / <alpha-value>)",
+        surface: "rgb(var(--study-surface) / <alpha-value>)",
+        "surface-muted": "rgb(var(--study-surface-muted) / <alpha-value>)",
+        border: "rgb(var(--study-border) / <alpha-value>)",
+        text: "rgb(var(--study-text) / <alpha-value>)",
+        muted: "rgb(var(--study-muted) / <alpha-value>)",
+        primary: "rgb(var(--study-primary) / <alpha-value>)",
+        "primary-hover": "rgb(var(--study-primary-hover) / <alpha-value>)",
+        success: "rgb(var(--study-success) / <alpha-value>)",
+        warning: "rgb(var(--study-warning) / <alpha-value>)",
+        danger: "rgb(var(--study-danger) / <alpha-value>)",
+        study: {
+          bg: "#F8FAFC",
+          sidebar: "#FFFFFF",
+          surface: "#F1F5F9",
+          surfaceMuted: "#EEF2FF",
+          text: "#0F172A",
+          muted: "#64748B",
+          border: "#E2E8F0",
+          card: "#FFFFFF",
+          darkBg: "#0F172A",
+          darkSidebar: "#111827",
+          darkCard: "#1E293B",
+          darkBorder: "#334155",
+          darkText: "#F8FAFC",
+          darkMuted: "#94A3B8",
+          primary: "#6366F1",
+          primaryHover: "#4F46E5",
+          success: "#22C55E",
+          warning: "#F59E0B",
+          danger: "#EF4444",
+        },
+      },
+      boxShadow: {
+        soft: "0 18px 50px rgba(15, 23, 42, 0.08)",
+        glow: "0 18px 54px rgba(99, 102, 241, 0.2)",
+        card: "0 10px 30px rgba(15, 23, 42, 0.08)",
+        "card-dark": "0 18px 60px rgba(2, 6, 23, 0.28)",
+      },
+      keyframes: {
+        gradient: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "50%": { transform: "translateY(-18px) rotate(4deg)" },
+        },
+        pulseGlow: {
+          "0%, 100%": { opacity: "0.5" },
+          "50%": { opacity: "0.9" },
+        },
+      },
+      animation: {
+        gradient: "gradient 12s ease infinite",
+        float: "float 7s ease-in-out infinite",
+        "float-slow": "float 10s ease-in-out infinite",
+        "pulse-glow": "pulseGlow 4s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [],
+};
