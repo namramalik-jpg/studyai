@@ -24,15 +24,22 @@ import Surface from "./ui/Surface";
 
 const MAX_PROMPT_LENGTH = 3000;
 
-function isSchemaMissingError(error) {
+function isNotesSetupError(error) {
   const message = error?.message || "";
+  const lowerMessage = message.toLowerCase();
 
   return (
     message.includes("Could not find") ||
     message.includes("schema cache") ||
     message.includes("does not exist") ||
     message.includes("prompt") ||
-    message.includes("generated_notes")
+    message.includes("generated_notes") ||
+    message.includes("tags") ||
+    message.includes("is_pinned") ||
+    message.includes("content") ||
+    message.includes("title") ||
+    lowerMessage.includes("row-level security") ||
+    lowerMessage.includes("permission denied")
   );
 }
 
@@ -228,8 +235,8 @@ export default function AINotesGenerator() {
         .single();
 
       if (saveError) {
-        if (isSchemaMissingError(saveError)) {
-          throw new Error("The notes table needs the prompt and generated_notes columns. Run database/ai-notes.sql in Supabase, then try again.");
+        if (isNotesSetupError(saveError)) {
+          throw new Error("AI notes saving is not set up in Supabase yet. Run database/ai-notes.sql in the Supabase SQL Editor, then try again.");
         }
 
         throw saveError;
