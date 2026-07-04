@@ -13,6 +13,20 @@ import {
 } from "lucide-react";
 import Button from "./ui/Button";
 
+const actionButtonClass =
+  "min-w-[6.25rem] flex-1 whitespace-nowrap break-normal px-3 [overflow-wrap:normal]";
+
+function cleanPreview(value) {
+  return String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function SavedNoteCard({
   item,
   isDeleting = false,
@@ -26,6 +40,7 @@ function SavedNoteCard({
   onShare,
 }) {
   const Icon = item.icon;
+  const preview = cleanPreview(item.preview);
 
   return (
     <article className="group flex h-full flex-col rounded-3xl border border-border bg-card p-4 shadow-card transition duration-300 hover:-translate-y-1 hover:border-primary/45 hover:shadow-glow dark:bg-card/85 dark:shadow-card-dark sm:p-5">
@@ -61,7 +76,7 @@ function SavedNoteCard({
           {item.title}
         </h3>
         <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-muted">
-          {item.preview}
+          {preview}
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-bold text-muted">
           <span>Saved {item.savedDate}</span>
@@ -74,16 +89,34 @@ function SavedNoteCard({
         </div>
       </button>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 border-t border-border pt-4 sm:grid-cols-4">
-        <Button type="button" variant="secondary" size="sm" onClick={() => onOpen?.(item)}>
+      <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onOpen?.(item)}
+          className={actionButtonClass}
+        >
           <Eye className="h-4 w-4" aria-hidden="true" />
           Open
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={() => onCopy?.(item)}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onCopy?.(item)}
+          className={actionButtonClass}
+        >
           <Copy className="h-4 w-4" aria-hidden="true" />
           Copy
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={() => onEditTitle?.(item)}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onEditTitle?.(item)}
+          className={actionButtonClass}
+        >
           <Pencil className="h-4 w-4" aria-hidden="true" />
           Edit
         </Button>
@@ -93,19 +126,35 @@ function SavedNoteCard({
           size="sm"
           onClick={() => onToggleFavorite?.(item)}
           disabled={isFavoriting}
+          className={actionButtonClass}
         >
           {isFavoriting ? (
             <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : (
-            <Star className={`h-4 w-4 ${item.isFavorite ? "fill-current" : ""}`} aria-hidden="true" />
+            <Star
+              className={`h-4 w-4 ${item.isFavorite ? "fill-current" : ""}`}
+              aria-hidden="true"
+            />
           )}
           {item.isFavorite ? "Saved" : "Fav"}
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={() => onDownloadPdf?.(item)}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onDownloadPdf?.(item)}
+          className={actionButtonClass}
+        >
           <Download className="h-4 w-4" aria-hidden="true" />
           PDF
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={() => onShare?.(item)}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onShare?.(item)}
+          className={actionButtonClass}
+        >
           <Link2 className="h-4 w-4" aria-hidden="true" />
           Share
         </Button>
@@ -115,7 +164,7 @@ function SavedNoteCard({
           size="sm"
           onClick={() => onDelete?.(item)}
           disabled={isDeleting}
-          className="col-span-2 sm:col-span-2"
+          className="min-w-[8rem] flex-[2_1_12rem] whitespace-nowrap break-normal px-3 [overflow-wrap:normal]"
         >
           {isDeleting ? (
             <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
