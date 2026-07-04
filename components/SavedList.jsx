@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import { generateSingleNotePdf } from "@/lib/pdfExport";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getSupabase } from "@/lib/supabase";
 import FlashcardModal from "./FlashcardModal";
 import NotesCard from "./NotesCard";
@@ -315,28 +316,26 @@ export default function SavedList({
         throw new Error("Please login again.");
       }
 
-      const { data, error: createError } = await supabase
-        .from(type)
-        .insert({
-          user_id: user.id,
-          [titleKey]: cleanTitle,
-          [contentKey]: cleanContent,
-          tags: parseTags(newTags),
-          is_pinned: false,
-        })
-        .select(getSavedListSelect(type, titleKey, contentKey))
-        .single();
-
-      if (createError) {
-        throw createError;
-      }
+      const data = await saveStudyItem(supabase, {
+        type,
+        title: cleanTitle,
+        content: cleanContent,
+        tags: parseTags(newTags),
+      });
+      const nextItem = {
+        ...data,
+        [titleKey]: data?.[titleKey] || cleanTitle,
+        [contentKey]: data?.[contentKey] || cleanContent,
+        tags: data?.tags || parseTags(newTags),
+        is_pinned: Boolean(data?.is_pinned),
+      };
 
       setItems((currentItems) => {
-        if (currentItems.some((item) => item.id === data.id)) {
+        if (currentItems.some((item) => item.id === nextItem.id)) {
           return currentItems;
         }
 
-        return [data, ...currentItems];
+        return [nextItem, ...currentItems];
       });
       resetCreateForm();
       setToast("Note created successfully.");
@@ -635,25 +634,17 @@ export default function SavedList({
         throw new Error(payload.error || "Could not generate quiz.");
       }
 
-      const { data: history, error: saveError } = await supabase
-        .from("quiz_history")
-        .insert({
-          user_id: user.id,
-          note_id: item.id,
-          topic: item[titleKey],
-          difficulty: "medium",
-          total_questions: Array.isArray(payload.quiz?.questions)
-            ? payload.quiz.questions.length
-            : 0,
-          quiz_data: payload.quiz,
-          score: null,
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        throw saveError;
-      }
+      const history = await saveStudyItem(supabase, {
+        type: "quiz_history",
+        note_id: item.id,
+        title: item[titleKey],
+        difficulty: "medium",
+        total_questions: Array.isArray(payload.quiz?.questions)
+          ? payload.quiz.questions.length
+          : 0,
+        quiz_data: payload.quiz,
+        score: null,
+      });
 
       const { error: historyError } = await saveAiHistory({
         supabase,

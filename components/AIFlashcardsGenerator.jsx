@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
 import { generateSingleNotePdf } from "@/lib/pdfExport";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser } from "@/lib/supabase";
 import Toast from "./Toast";
 import Button from "./ui/Button";
@@ -54,19 +55,6 @@ function shuffleCards(cards) {
   }
 
   return nextCards;
-}
-
-function isSchemaMissingError(error) {
-  const message = error?.message || "";
-
-  return (
-    message.includes("Could not find") ||
-    message.includes("schema cache") ||
-    message.includes("does not exist") ||
-    message.includes("flashcard_decks") ||
-    message.includes("flashcards_json") ||
-    message.includes("total_cards")
-  );
 }
 
 export default function AIFlashcardsGenerator() {
@@ -267,28 +255,15 @@ export default function AIFlashcardsGenerator() {
 
     try {
       const { supabase, user } = await getAuthenticatedSession();
-      const { data, error: saveError } = await supabase
-        .from("flashcard_decks")
-        .insert({
-          user_id: user.id,
-          topic: cleanInput.slice(0, 160) || "Study Flashcards",
-          flashcards_json: {
-            cards,
-            ratings: cardRatings,
-          },
-          total_cards: cards.length,
-          created_at: new Date().toISOString(),
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        if (isSchemaMissingError(saveError)) {
-          throw new Error("The flashcard_decks table is missing. Run database/ai-flashcards.sql in Supabase, then try again.");
-        }
-
-        throw saveError;
-      }
+      const data = await saveStudyItem(supabase, {
+        type: "flashcard_decks",
+        title: cleanInput.slice(0, 160) || "Study Flashcards",
+        flashcards_json: {
+          cards,
+          ratings: cardRatings,
+        },
+        total_cards: cards.length,
+      });
 
       setSavedDeckId(data?.id || "");
       setMessage("Flashcard deck saved.");

@@ -18,6 +18,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser } from "@/lib/supabase";
 import HistoryCard from "./HistoryCard";
 import Toast from "./Toast";
@@ -432,40 +433,31 @@ export default function AIHistoryPageClient() {
       const { supabase, user } = await getAuthenticatedSession();
 
       if (item.type === "notes") {
-        const { error: saveError } = await supabase.from("notes").insert({
-          user_id: user.id,
+        await saveStudyItem(supabase, {
+          type: "notes",
           title: item.title,
           prompt: item.prompt,
-          generated_notes: item.response,
           content: item.response,
           tags: ["history"],
-          is_pinned: false,
         });
-
-        if (saveError) throw saveError;
       } else if (item.type === "summary") {
-        const { error: saveError } = await supabase.from("summaries").insert({
-          user_id: user.id,
-          topic: item.title,
-          original_text: item.prompt,
-          generated_summary: item.response,
+        await saveStudyItem(supabase, {
+          type: "summaries",
+          title: item.title,
+          prompt: item.prompt,
           content: item.response,
         });
-
-        if (saveError) throw saveError;
       } else if (item.type === "quiz") {
         const parsed = safeJsonParse(item.response) || { content: item.response };
         const questions = Array.isArray(parsed.questions) ? parsed.questions : [];
-        const { error: saveError } = await supabase.from("quiz_history").insert({
-          user_id: user.id,
-          topic: item.title,
+        await saveStudyItem(supabase, {
+          type: "quiz_history",
+          title: item.title,
           difficulty: parsed.difficulty || "medium",
           total_questions: questions.length || parsed.total_questions || 0,
           score: parsed.score ?? null,
           quiz_data: parsed,
         });
-
-        if (saveError) throw saveError;
       } else if (item.type === "flashcards") {
         const parsedResponse = safeJsonParse(item.response);
         const cards = Array.isArray(parsedResponse)
@@ -478,14 +470,12 @@ export default function AIHistoryPageClient() {
         const deckPayload = Array.isArray(parsedResponse)
           ? { cards: parsedResponse }
           : parsedResponse || { cards: [], content: item.response };
-        const { error: saveError } = await supabase.from("flashcard_decks").insert({
-          user_id: user.id,
-          topic: item.title,
+        await saveStudyItem(supabase, {
+          type: "flashcard_decks",
+          title: item.title,
           flashcards_json: deckPayload,
           total_cards: cards.length || Number(deckPayload.total_cards || 0),
         });
-
-        if (saveError) throw saveError;
       }
 
       setMessage(`${item.featureLabel} saved successfully.`);

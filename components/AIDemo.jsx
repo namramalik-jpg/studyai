@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser, getSupabase } from "@/lib/supabase";
 import ScrollReveal from "./ScrollReveal";
 import Button from "./ui/Button";
@@ -234,34 +235,13 @@ export default function AIDemo() {
         return;
       }
 
-      const table = currentTool.saveType;
-      let row;
-
-      if (table === "questions") {
-        row = {
-          user_id: currentUser.id,
-          question: cleanTopic,
-          answer: cleanNotes,
-        };
-      } else if (table === "notes") {
-        row = {
-          user_id: currentUser.id,
-          title: cleanTopic,
-          content: cleanNotes,
-        };
-      } else {
-        row = {
-          user_id: currentUser.id,
-          topic: cleanTopic,
-          content: cleanNotes,
-        };
-      }
-
-      const { error: saveError } = await supabase.from(table).insert(row);
-
-      if (saveError) {
-        throw saveError;
-      }
+      await saveStudyItem(supabase, {
+        type: currentTool.saveType,
+        title: cleanTopic,
+        prompt: cleanTopic,
+        content: cleanNotes,
+        tags: ["dashboard"],
+      });
 
       setSaveMessage("Saved successfully.");
     } catch (saveError) {

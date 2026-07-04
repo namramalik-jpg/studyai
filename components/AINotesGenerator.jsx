@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
 import { generateSingleNotePdf } from "@/lib/pdfExport";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser } from "@/lib/supabase";
 import AIOutputFormatter from "./AIOutputFormatter";
 import Toast from "./Toast";
@@ -23,25 +24,6 @@ import EmptyState from "./ui/EmptyState";
 import Surface from "./ui/Surface";
 
 const MAX_PROMPT_LENGTH = 3000;
-
-function isNotesSetupError(error) {
-  const message = error?.message || "";
-  const lowerMessage = message.toLowerCase();
-
-  return (
-    message.includes("Could not find") ||
-    message.includes("schema cache") ||
-    message.includes("does not exist") ||
-    message.includes("prompt") ||
-    message.includes("generated_notes") ||
-    message.includes("tags") ||
-    message.includes("is_pinned") ||
-    message.includes("content") ||
-    message.includes("title") ||
-    lowerMessage.includes("row-level security") ||
-    lowerMessage.includes("permission denied")
-  );
-}
 
 function getNoteTitle(prompt, notes) {
   const firstMeaningfulLine = String(notes || "")
@@ -219,28 +201,13 @@ export default function AINotesGenerator() {
 
     try {
       const { supabase, user } = await getAuthenticatedSession();
-      const { data, error: saveError } = await supabase
-        .from("notes")
-        .insert({
-          user_id: user.id,
-          title: noteTitle,
-          prompt: cleanPrompt,
-          generated_notes: generatedNotes,
-          content: generatedNotes,
-          tags: ["ai-notes"],
-          is_pinned: false,
-          created_at: new Date().toISOString(),
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        if (isNotesSetupError(saveError)) {
-          throw new Error("AI notes saving is not set up in Supabase yet. Run database/ai-notes.sql in the Supabase SQL Editor, then try again.");
-        }
-
-        throw saveError;
-      }
+      const data = await saveStudyItem(supabase, {
+        type: "notes",
+        title: noteTitle,
+        prompt: cleanPrompt,
+        content: generatedNotes,
+        tags: ["ai-notes"],
+      });
 
       setSavedNoteId(data?.id || "");
       setMessage("Notes saved to your workspace.");

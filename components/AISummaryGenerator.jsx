@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
 import { generateSingleNotePdf } from "@/lib/pdfExport";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser } from "@/lib/supabase";
 import AIOutputFormatter from "./AIOutputFormatter";
 import Toast from "./Toast";
@@ -23,18 +24,6 @@ import EmptyState from "./ui/EmptyState";
 import Surface from "./ui/Surface";
 
 const MAX_INPUT_LENGTH = 12000;
-
-function isSchemaMissingError(error) {
-  const message = error?.message || "";
-
-  return (
-    message.includes("Could not find") ||
-    message.includes("schema cache") ||
-    message.includes("does not exist") ||
-    message.includes("original_text") ||
-    message.includes("generated_summary")
-  );
-}
 
 function getSummaryTitle(input, summary) {
   const firstMeaningfulLine = String(summary || "")
@@ -216,26 +205,12 @@ export default function AISummaryGenerator() {
 
     try {
       const { supabase, user } = await getAuthenticatedSession();
-      const { data, error: saveError } = await supabase
-        .from("summaries")
-        .insert({
-          user_id: user.id,
-          topic: summaryTitle,
-          original_text: cleanInput,
-          generated_summary: generatedSummary,
-          content: generatedSummary,
-          created_at: new Date().toISOString(),
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        if (isSchemaMissingError(saveError)) {
-          throw new Error("The summaries table needs the original_text and generated_summary columns. Run database/ai-summary.sql in Supabase, then try again.");
-        }
-
-        throw saveError;
-      }
+      const data = await saveStudyItem(supabase, {
+        type: "summaries",
+        title: summaryTitle,
+        prompt: cleanInput,
+        content: generatedSummary,
+      });
 
       setSavedSummaryId(data?.id || "");
       setMessage("Summary saved to your workspace.");

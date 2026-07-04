@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { saveAiHistory } from "@/lib/aiHistory";
 import { addStudyNotification } from "@/lib/notifications";
 import { generateSingleNotePdf } from "@/lib/pdfExport";
+import { saveStudyItem } from "@/lib/saveStudyItem";
 import { getCurrentUser } from "@/lib/supabase";
 import Toast from "./Toast";
 import Button from "./ui/Button";
@@ -44,19 +45,6 @@ function isAnswerCorrect(question, answer) {
 
 function formatDifficulty(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function isSchemaMissingError(error) {
-  const message = error?.message || "";
-
-  return (
-    message.includes("Could not find") ||
-    message.includes("schema cache") ||
-    message.includes("does not exist") ||
-    message.includes("topic") ||
-    message.includes("difficulty") ||
-    message.includes("total_questions")
-  );
 }
 
 function getQuizText(quiz) {
@@ -291,33 +279,20 @@ export default function AIQuizGenerator() {
 
     try {
       const { supabase, user } = await getAuthenticatedSession();
-      const { data, error: saveError } = await supabase
-        .from("quiz_history")
-        .insert({
-          user_id: user.id,
-          topic: cleanInput.slice(0, 160) || quiz.topic || quiz.title || "AI Quiz",
-          difficulty,
-          total_questions: questions.length,
+      const data = await saveStudyItem(supabase, {
+        type: "quiz_history",
+        title: cleanInput.slice(0, 160) || quiz.topic || quiz.title || "AI Quiz",
+        difficulty,
+        total_questions: questions.length,
+        score,
+        quiz_data: {
+          ...quiz,
+          answers,
           score,
-          quiz_data: {
-            ...quiz,
-            answers,
-            score,
-            percentage,
-            submitted_at: new Date().toISOString(),
-          },
-          created_at: new Date().toISOString(),
-        })
-        .select("id")
-        .single();
-
-      if (saveError) {
-        if (isSchemaMissingError(saveError)) {
-          throw new Error("The quiz_history table needs topic, difficulty, total_questions, and nullable note_id. Run database/ai-quiz.sql in Supabase, then try again.");
-        }
-
-        throw saveError;
-      }
+          percentage,
+          submitted_at: new Date().toISOString(),
+        },
+      });
 
       setSavedResultId(data?.id || "");
       setMessage("Quiz result saved.");
