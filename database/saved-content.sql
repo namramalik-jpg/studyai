@@ -1,5 +1,5 @@
 -- StudyAI saved content migration
--- Run this in the Supabase SQL Editor if notes, summaries, questions, or flashcards are not saving.
+-- Run this in the Supabase SQL Editor if notes, summaries, questions, flashcards, or favorites are not saving.
 
 create extension if not exists "pgcrypto";
 
@@ -91,6 +91,15 @@ create table if not exists public.flashcards (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.favorites (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  item_type text not null default 'study_item',
+  item_id uuid,
+  title text not null default 'Saved item',
+  created_at timestamptz not null default now()
+);
+
 alter table public.flashcard_decks
   add column if not exists topic text,
   add column if not exists flashcards_json jsonb,
@@ -113,6 +122,11 @@ alter table public.flashcard_decks
 alter table public.flashcards
   alter column note_id drop not null;
 
+alter table public.favorites
+  add column if not exists item_type text not null default 'study_item',
+  add column if not exists item_id uuid,
+  add column if not exists title text not null default 'Saved item';
+
 create index if not exists notes_user_created_idx
   on public.notes (user_id, created_at desc);
 
@@ -127,6 +141,13 @@ create index if not exists flashcard_decks_user_created_idx
 
 create index if not exists flashcards_user_created_idx
   on public.flashcards (user_id, created_at desc);
+
+create index if not exists favorites_user_created_idx
+  on public.favorites (user_id, created_at desc);
+
+create unique index if not exists favorites_user_item_idx
+  on public.favorites (user_id, item_type, item_id)
+  where item_id is not null;
 
 create or replace function public.is_admin()
 returns boolean
@@ -148,6 +169,7 @@ alter table public.summaries enable row level security;
 alter table public.questions enable row level security;
 alter table public.flashcard_decks enable row level security;
 alter table public.flashcards enable row level security;
+alter table public.favorites enable row level security;
 
 drop policy if exists "Users can read own notes" on public.notes;
 create policy "Users can read own notes"
@@ -246,6 +268,21 @@ create policy "Users can update own flashcards"
 drop policy if exists "Users can delete own flashcards" on public.flashcards;
 create policy "Users can delete own flashcards"
   on public.flashcards for delete
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can read own favorites" on public.favorites;
+create policy "Users can read own favorites"
+  on public.favorites for select
+  using (auth.uid() = user_id or public.is_admin());
+
+drop policy if exists "Users can insert own favorites" on public.favorites;
+create policy "Users can insert own favorites"
+  on public.favorites for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own favorites" on public.favorites;
+create policy "Users can delete own favorites"
+  on public.favorites for delete
   using (auth.uid() = user_id);
 
 notify pgrst, 'reload schema';
