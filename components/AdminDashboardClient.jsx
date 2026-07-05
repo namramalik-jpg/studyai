@@ -44,6 +44,11 @@ const statCards = [
   { key: "aiRequests", label: "Total AI Requests", description: "Gemini generations", icon: Activity },
 ];
 
+const adminActionButtonClass =
+  "min-w-[7rem] whitespace-nowrap break-normal px-4 [overflow-wrap:normal]";
+const adminRoleActionButtonClass =
+  "min-w-[11.25rem] whitespace-nowrap break-normal px-4 [overflow-wrap:normal]";
+
 function isMissingSchemaError(error) {
   const message = error?.message || "";
 
@@ -830,14 +835,14 @@ export default function AdminDashboardClient() {
             />
           ) : (
             <div className="overflow-x-auto study-scrollbar">
-              <table className="min-w-[60rem] divide-y divide-border">
+              <table className="min-w-[76rem] divide-y divide-border">
                 <thead className="bg-surface">
                   <tr>
                     {["User", "Role", "Joined Date", "Last Login", "Actions"].map((heading) => (
                       <th
                         key={heading}
                         className={`px-5 py-3 text-xs font-black uppercase tracking-wide text-muted ${
-                          heading === "Actions" ? "text-right" : "text-left"
+                          heading === "Actions" ? "w-[28rem] text-right" : "text-left"
                         }`}
                       >
                         {heading}
@@ -876,9 +881,15 @@ export default function AdminDashboardClient() {
                         <td className="px-5 py-4 text-sm font-semibold text-muted">
                           {formatDate(profile.last_login)}
                         </td>
-                        <td className="px-5 py-4">
-                          <div className="flex justify-end gap-2">
-                            <Button type="button" variant="secondary" size="sm" onClick={() => setViewingUser(profile)}>
+                        <td className="w-[28rem] px-5 py-4">
+                          <div className="flex min-w-[26rem] justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setViewingUser(profile)}
+                              className={adminActionButtonClass}
+                            >
                               <Eye className="h-4 w-4" aria-hidden="true" />
                               View
                             </Button>
@@ -888,6 +899,7 @@ export default function AdminDashboardClient() {
                               size="sm"
                               onClick={() => updateUserRole(profile, nextRole)}
                               disabled={isCurrentUser || updatingUserId === profile.id}
+                              className={adminRoleActionButtonClass}
                             >
                               {updatingUserId === profile.id ? (
                                 <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -902,6 +914,7 @@ export default function AdminDashboardClient() {
                               size="sm"
                               onClick={() => setDeleteTarget(profile)}
                               disabled={isCurrentUser || deletingUserId === profile.id}
+                              className={adminActionButtonClass}
                             >
                               <Trash2 className="h-4 w-4" aria-hidden="true" />
                               Delete
