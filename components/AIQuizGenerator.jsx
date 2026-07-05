@@ -32,7 +32,7 @@ const difficulties = ["easy", "medium", "hard"];
 const questionCounts = [5, 10, 15];
 const optionLabels = ["A", "B", "C", "D"];
 const quizToggleButtonClass =
-  "min-h-11 min-w-0 overflow-hidden whitespace-nowrap rounded-xl px-2 py-2 text-center text-xs font-bold leading-none transition sm:text-sm";
+  "min-h-11 min-w-0 whitespace-nowrap rounded-xl px-4 py-2 text-center text-sm font-bold leading-tight transition";
 
 function normalizeAnswer(value) {
   return String(value || "")
@@ -394,7 +394,7 @@ export default function AIQuizGenerator() {
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4">
             <div>
               <p id="quiz-difficulty-label" className="text-sm font-black text-text">Difficulty</p>
               <div className="mt-3 grid grid-cols-3 gap-2 rounded-2xl bg-surface p-2" role="radiogroup" aria-labelledby="quiz-difficulty-label">
