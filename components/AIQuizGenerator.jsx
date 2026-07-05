@@ -31,6 +31,8 @@ const MAX_INPUT_LENGTH = 12000;
 const difficulties = ["easy", "medium", "hard"];
 const questionCounts = [5, 10, 15];
 const optionLabels = ["A", "B", "C", "D"];
+const quizToggleButtonClass =
+  "min-h-11 min-w-0 overflow-hidden whitespace-nowrap rounded-xl px-2 py-2 text-center text-xs font-bold leading-none transition sm:text-sm";
 
 function normalizeAnswer(value) {
   return String(value || "")
@@ -404,7 +406,7 @@ export default function AIQuizGenerator() {
                     disabled={isGenerating}
                     role="radio"
                     aria-checked={difficulty === item}
-                    className={`min-h-11 rounded-xl px-3 py-2 text-sm font-bold transition ${
+                    className={`${quizToggleButtonClass} ${
                       difficulty === item
                         ? "bg-card text-primary shadow-sm"
                         : "text-muted hover:bg-card hover:text-primary"
@@ -427,7 +429,7 @@ export default function AIQuizGenerator() {
                     disabled={isGenerating}
                     role="radio"
                     aria-checked={totalQuestions === count}
-                    className={`min-h-11 rounded-xl px-3 py-2 text-sm font-bold transition ${
+                    className={`${quizToggleButtonClass} ${
                       totalQuestions === count
                         ? "bg-card text-primary shadow-sm"
                         : "text-muted hover:bg-card hover:text-primary"
