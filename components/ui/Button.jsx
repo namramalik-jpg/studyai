@@ -32,7 +32,7 @@ export default function Button({
   return (
     <Component
       className={cx(
-        "inline-flex min-w-0 max-w-full items-center justify-center gap-2 text-center font-bold leading-tight transition duration-200 [overflow-wrap:anywhere] [&>svg]:shrink-0",
+        "inline-flex min-w-0 max-w-full items-center justify-center gap-2 text-center font-bold leading-tight transition duration-200 break-normal hyphens-none [overflow-wrap:normal] [word-break:normal] [&>svg]:shrink-0",
         "hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60",
         "study-focus",
         buttonVariants[variant],
