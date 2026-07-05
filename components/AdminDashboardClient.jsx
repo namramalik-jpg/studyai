@@ -44,10 +44,16 @@ const statCards = [
   { key: "aiRequests", label: "Total AI Requests", description: "Gemini generations", icon: Activity },
 ];
 
-const adminActionButtonClass =
-  "min-w-[7rem] whitespace-nowrap break-normal px-4 [overflow-wrap:normal]";
-const adminRoleActionButtonClass =
-  "min-w-[11.25rem] whitespace-nowrap break-normal px-4 [overflow-wrap:normal]";
+const adminActionButtonBase =
+  "study-focus inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2 text-center text-sm font-bold leading-tight whitespace-nowrap transition duration-200 [overflow-wrap:normal] [&>svg]:shrink-0 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
+const adminSecondaryActionButtonClass = `${adminActionButtonBase} min-w-[7rem] border border-border bg-card text-text shadow-sm hover:bg-surface`;
+const adminRoleActionButtonClass = `${adminActionButtonBase} min-w-[11.25rem] border border-border bg-card text-text shadow-sm hover:bg-surface`;
+const adminDangerActionButtonClass = `${adminActionButtonBase} min-w-[7rem] bg-danger/10 text-danger hover:bg-danger hover:text-white`;
+const adminActionButtonStyle = {
+  overflowWrap: "normal",
+  whiteSpace: "nowrap",
+  wordBreak: "normal",
+};
 
 function isMissingSchemaError(error) {
   const message = error?.message || "";
@@ -883,23 +889,21 @@ export default function AdminDashboardClient() {
                         </td>
                         <td className="w-[28rem] px-5 py-4">
                           <div className="flex min-w-[26rem] justify-end gap-2">
-                            <Button
+                            <button
                               type="button"
-                              variant="secondary"
-                              size="sm"
                               onClick={() => setViewingUser(profile)}
-                              className={adminActionButtonClass}
+                              className={adminSecondaryActionButtonClass}
+                              style={adminActionButtonStyle}
                             >
                               <Eye className="h-4 w-4" aria-hidden="true" />
                               View
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                               type="button"
-                              variant="secondary"
-                              size="sm"
                               onClick={() => updateUserRole(profile, nextRole)}
                               disabled={isCurrentUser || updatingUserId === profile.id}
                               className={adminRoleActionButtonClass}
+                              style={adminActionButtonStyle}
                             >
                               {updatingUserId === profile.id ? (
                                 <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -907,18 +911,17 @@ export default function AdminDashboardClient() {
                                 <UserCog className="h-4 w-4" aria-hidden="true" />
                               )}
                               {isCurrentUser ? "Current Admin" : profile.role === "admin" ? "Set User" : "Make Admin"}
-                            </Button>
-                            <Button
+                            </button>
+                            <button
                               type="button"
-                              variant="danger"
-                              size="sm"
                               onClick={() => setDeleteTarget(profile)}
                               disabled={isCurrentUser || deletingUserId === profile.id}
-                              className={adminActionButtonClass}
+                              className={adminDangerActionButtonClass}
+                              style={adminActionButtonStyle}
                             >
                               <Trash2 className="h-4 w-4" aria-hidden="true" />
                               Delete
-                            </Button>
+                            </button>
                           </div>
                         </td>
                       </tr>
