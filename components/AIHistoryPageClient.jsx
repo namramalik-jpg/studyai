@@ -143,6 +143,48 @@ function looksLikeFlashcardsResponse(response) {
   );
 }
 
+function cleanGeneratedText(value) {
+  return String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/^```(?:markdown|md|text)?\s*/i, "")
+    .replace(/```$/i, "")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function getTextFromResponse(response, type) {
+  const parsed = safeJsonParse(response);
+
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+    const candidates =
+      type === "summary"
+        ? [
+            parsed.generated_summary,
+            parsed.summary,
+            parsed.content,
+            parsed.response,
+            parsed.text,
+          ]
+        : [
+            parsed.generated_notes,
+            parsed.notes,
+            parsed.content,
+            parsed.response,
+            parsed.text,
+          ];
+
+    const firstText = candidates.find((candidate) => typeof candidate === "string" && candidate.trim());
+    if (firstText) return firstText;
+  }
+
+  return String(response || "");
+}
+
 function getFlashcardsFromResponse(response) {
   const parsed = safeJsonParse(response);
   const cards = Array.isArray(parsed)
@@ -216,7 +258,11 @@ function formatHistoryResponse(response, type) {
     return formatQuizResponse(response);
   }
 
-  return String(response || "");
+  if (type === "summary" || type === "notes") {
+    return cleanGeneratedText(getTextFromResponse(response, type));
+  }
+
+  return cleanGeneratedText(response);
 }
 
 function getTitleFromResponse(response, prompt, type) {
