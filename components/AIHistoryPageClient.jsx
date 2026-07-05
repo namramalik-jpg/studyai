@@ -93,6 +93,82 @@ function safeJsonParse(value) {
   }
 }
 
+function getFlashcardsFromResponse(response) {
+  const parsed = safeJsonParse(response);
+  const cards = Array.isArray(parsed)
+    ? parsed
+    : Array.isArray(parsed?.cards)
+      ? parsed.cards
+      : Array.isArray(parsed?.flashcards)
+        ? parsed.flashcards
+        : [];
+
+  return cards;
+}
+
+function formatFlashcardsResponse(response) {
+  const cards = getFlashcardsFromResponse(response);
+
+  if (cards.length === 0) return String(response || "");
+
+  return cards
+    .map((card, index) => {
+      const front =
+        card.front ||
+        card.front_text ||
+        card.question ||
+        card.concept ||
+        "Untitled card";
+      const back =
+        card.back ||
+        card.back_text ||
+        card.answer ||
+        card.explanation ||
+        "No answer provided";
+
+      return `Card ${index + 1}\nFront: ${front}\nBack: ${back}`;
+    })
+    .join("\n\n");
+}
+
+function formatQuizResponse(response) {
+  const parsed = safeJsonParse(response);
+  const questions = Array.isArray(parsed)
+    ? parsed
+    : Array.isArray(parsed?.questions)
+      ? parsed.questions
+      : [];
+
+  if (questions.length === 0) return String(response || "");
+
+  return questions
+    .map((question, index) => {
+      const options = Array.isArray(question.options) ? question.options : [];
+      const answer =
+        question.answer ||
+        question.correct_answer ||
+        question.correctAnswer ||
+        "Not provided";
+
+      return [
+        `Question ${index + 1}: ${question.question || question.prompt || "Untitled question"}`,
+        ...options.map((option, optionIndex) => `${String.fromCharCode(65 + optionIndex)}. ${option}`),
+        `Correct Answer: ${answer}`,
+        question.explanation ? `Explanation: ${question.explanation}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+}
+
+function formatHistoryResponse(response, type) {
+  if (type === "flashcards") return formatFlashcardsResponse(response);
+  if (type === "quiz") return formatQuizResponse(response);
+
+  return String(response || "");
+}
+
 function getTitleFromResponse(response, prompt, type) {
   const parsed = safeJsonParse(response);
 
@@ -127,7 +203,8 @@ function normalizeHistoryItem(item) {
   const type = getFeatureType(item.feature);
   const style = featureStyles[type] || featureStyles.notes;
   const title = getTitleFromResponse(item.response, item.prompt, type);
-  const preview = String(item.response || item.prompt || "")
+  const displayResponse = formatHistoryResponse(item.response, type);
+  const preview = String(displayResponse || item.prompt || "")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 120);
@@ -136,6 +213,7 @@ function normalizeHistoryItem(item) {
     ...item,
     type,
     title,
+    displayResponse,
     preview: preview || "No preview available.",
     featureLabel: style.label,
     icon: style.icon,
@@ -250,7 +328,7 @@ function HistoryDetailModal({ item, isSaving, isRegenerating, onClose, onCopy, o
                 Generated Content
               </p>
               <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-text [overflow-wrap:anywhere]">
-                {item.response}
+                {item.displayResponse || item.response}
               </p>
             </section>
           </div>
@@ -416,7 +494,7 @@ export default function AIHistoryPageClient() {
   const copyItem = useCallback(async (item) => {
     try {
       await navigator.clipboard.writeText(
-        `Prompt:\n${item.prompt}\n\nResponse:\n${item.response}`
+        `Prompt:\n${item.prompt}\n\nResponse:\n${item.displayResponse || item.response}`
       );
       setMessage("History item copied.");
     } catch (_copyError) {
@@ -437,7 +515,7 @@ export default function AIHistoryPageClient() {
           type: "notes",
           title: item.title,
           prompt: item.prompt,
-          content: item.response,
+          content: item.displayResponse || item.response,
           tags: ["history"],
         });
       } else if (item.type === "summary") {
@@ -445,7 +523,7 @@ export default function AIHistoryPageClient() {
           type: "summaries",
           title: item.title,
           prompt: item.prompt,
-          content: item.response,
+          content: item.displayResponse || item.response,
         });
       } else if (item.type === "quiz") {
         const parsed = safeJsonParse(item.response) || { content: item.response };
@@ -460,13 +538,7 @@ export default function AIHistoryPageClient() {
         });
       } else if (item.type === "flashcards") {
         const parsedResponse = safeJsonParse(item.response);
-        const cards = Array.isArray(parsedResponse)
-          ? parsedResponse
-          : Array.isArray(parsedResponse?.cards)
-            ? parsedResponse.cards
-            : Array.isArray(parsedResponse?.flashcards)
-              ? parsedResponse.flashcards
-              : [];
+        const cards = getFlashcardsFromResponse(item.response);
         const deckPayload = Array.isArray(parsedResponse)
           ? { cards: parsedResponse }
           : parsedResponse || { cards: [], content: item.response };
