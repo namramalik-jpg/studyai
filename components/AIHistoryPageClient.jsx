@@ -86,11 +86,61 @@ function getFeatureType(feature) {
 }
 
 function safeJsonParse(value) {
-  try {
-    return JSON.parse(value);
-  } catch (_error) {
-    return null;
+  if (!value) return null;
+  if (typeof value === "object") return value;
+
+  const text = String(value)
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
+
+  const candidates = [text];
+  const firstObjectIndex = text.indexOf("{");
+  const lastObjectIndex = text.lastIndexOf("}");
+  const firstArrayIndex = text.indexOf("[");
+  const lastArrayIndex = text.lastIndexOf("]");
+
+  if (firstObjectIndex !== -1 && lastObjectIndex > firstObjectIndex) {
+    candidates.push(text.slice(firstObjectIndex, lastObjectIndex + 1));
   }
+
+  if (firstArrayIndex !== -1 && lastArrayIndex > firstArrayIndex) {
+    candidates.push(text.slice(firstArrayIndex, lastArrayIndex + 1));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch (_error) {
+      // Try the next candidate.
+    }
+  }
+
+  return null;
+}
+
+function getQuizQuestionsFromResponse(response) {
+  const parsed = safeJsonParse(response);
+  const questions = Array.isArray(parsed)
+    ? parsed
+    : Array.isArray(parsed?.questions)
+      ? parsed.questions
+      : [];
+
+  return questions;
+}
+
+function looksLikeQuizResponse(response) {
+  return getQuizQuestionsFromResponse(response).some((question) =>
+    Boolean(question?.question || question?.prompt)
+  );
+}
+
+function looksLikeFlashcardsResponse(response) {
+  return getFlashcardsFromResponse(response).some((card) =>
+    Boolean(card?.front || card?.front_text || card?.back || card?.back_text)
+  );
 }
 
 function getFlashcardsFromResponse(response) {
@@ -132,12 +182,7 @@ function formatFlashcardsResponse(response) {
 }
 
 function formatQuizResponse(response) {
-  const parsed = safeJsonParse(response);
-  const questions = Array.isArray(parsed)
-    ? parsed
-    : Array.isArray(parsed?.questions)
-      ? parsed.questions
-      : [];
+  const questions = getQuizQuestionsFromResponse(response);
 
   if (questions.length === 0) return String(response || "");
 
@@ -163,8 +208,13 @@ function formatQuizResponse(response) {
 }
 
 function formatHistoryResponse(response, type) {
-  if (type === "flashcards") return formatFlashcardsResponse(response);
-  if (type === "quiz") return formatQuizResponse(response);
+  if (type === "flashcards" || looksLikeFlashcardsResponse(response)) {
+    return formatFlashcardsResponse(response);
+  }
+
+  if (type === "quiz" || looksLikeQuizResponse(response)) {
+    return formatQuizResponse(response);
+  }
 
   return String(response || "");
 }
