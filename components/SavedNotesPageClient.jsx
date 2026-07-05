@@ -287,8 +287,34 @@ function ConfirmationModal({ title, description, isWorking, onCancel, onConfirm 
   );
 }
 
-function EditTitleModal({ item, value, isWorking, onChange, onCancel, onSave }) {
+function canEditSavedContent(item) {
+  return item?.sourceType === "notes" || item?.sourceType === "summary";
+}
+
+function isMissingColumnError(error) {
+  const message = error?.message || "";
+
+  return (
+    message.includes("Could not find") ||
+    message.includes("schema cache") ||
+    message.includes("column") ||
+    message.includes("does not exist")
+  );
+}
+
+function EditItemModal({
+  item,
+  titleValue,
+  contentValue,
+  isWorking,
+  onTitleChange,
+  onContentChange,
+  onCancel,
+  onSave,
+}) {
   if (!item) return null;
+
+  const canEditContent = canEditSavedContent(item);
 
   return (
     <div className="fixed inset-0 z-[75] flex items-start justify-center overflow-y-auto bg-slate-950/70 px-4 py-6 backdrop-blur-sm sm:items-center" role="dialog" aria-modal="true" aria-labelledby="saved-edit-title">
@@ -297,22 +323,35 @@ function EditTitleModal({ item, value, isWorking, onChange, onCancel, onSave }) 
           event.preventDefault();
           onSave?.();
         }}
-        className="w-full max-w-lg rounded-3xl border border-border bg-card p-5 shadow-card dark:bg-card"
+        className="w-full max-w-3xl rounded-3xl border border-border bg-card p-5 shadow-card dark:bg-card"
       >
         <h2 id="saved-edit-title" className="text-xl font-black text-text">
-          Edit title
+          Edit saved item
         </h2>
         <p className="mt-2 text-sm leading-6 text-muted">
-          Rename this {item.featureLabel.toLowerCase()} without changing its generated content.
+          {canEditContent
+            ? `Update this ${item.featureLabel.toLowerCase()}'s title and content.`
+            : `Rename this ${item.featureLabel.toLowerCase()}. Structured quiz and flashcard content can be regenerated from its page.`}
         </p>
         <Input
-          value={value}
-          onChange={(event) => onChange?.(event.target.value)}
+          value={titleValue}
+          onChange={(event) => onTitleChange?.(event.target.value)}
           disabled={isWorking}
           className="mt-5"
           placeholder="Saved item title"
           aria-label="Saved item title"
         />
+        {canEditContent && (
+          <textarea
+            value={contentValue}
+            onChange={(event) => onContentChange?.(event.target.value)}
+            disabled={isWorking}
+            rows={12}
+            className="mt-4 min-h-64 w-full resize-y rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-7 text-text outline-none transition placeholder:text-muted focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-sidebar"
+            placeholder="Edit saved content..."
+            aria-label="Saved item content"
+          />
+        )}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Button type="button" variant="secondary" onClick={onCancel} disabled={isWorking}>
             <X className="h-4 w-4" aria-hidden="true" />
@@ -324,7 +363,7 @@ function EditTitleModal({ item, value, isWorking, onChange, onCancel, onSave }) 
             ) : (
               <Check className="h-4 w-4" aria-hidden="true" />
             )}
-            Save title
+            Save changes
           </Button>
         </div>
       </form>
@@ -401,7 +440,7 @@ function DetailModal({ item, onClose, onCopy, onEditTitle, onFavorite, onDownloa
           </Button>
           <Button type="button" variant="secondary" onClick={() => onEditTitle(item)}>
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Edit title
+            Edit
           </Button>
           <Button type="button" variant={item.isFavorite ? "primary" : "secondary"} onClick={() => onFavorite(item)} disabled={isFavoriting}>
             {isFavoriting ? (
@@ -437,6 +476,7 @@ export default function SavedNotesPageClient() {
   const [activeItem, setActiveItem] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
   const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -616,6 +656,7 @@ export default function SavedNotesPageClient() {
   const openEditTitle = useCallback((item) => {
     setEditingItem(item);
     setEditTitle(item.title);
+    setEditContent(item.content || "");
   }, []);
 
   function getTitleColumn(item) {
@@ -627,13 +668,64 @@ export default function SavedNotesPageClient() {
     return "title";
   }
 
-  async function saveTitleEdit() {
+  function getContentColumnUpdates(item, content) {
+    if (item.sourceType === "notes") {
+      return {
+        full: { generated_notes: content, content },
+        fallback: { content },
+      };
+    }
+
+    if (item.sourceType === "summary") {
+      return {
+        full: { generated_summary: content, content },
+        fallback: { content },
+      };
+    }
+
+    return { full: {}, fallback: null };
+  }
+
+  async function updateSavedSourceItem(supabase, item, updates, fallbackUpdates) {
+    const updateQuery = supabase
+      .from(item.sourceTable)
+      .update(updates)
+      .eq("id", item.sourceId)
+      .eq("user_id", item.userId);
+
+    const { error: updateError } = await updateQuery;
+
+    if (!updateError) return;
+
+    if (!fallbackUpdates || !isMissingColumnError(updateError)) {
+      throw updateError;
+    }
+
+    const fallbackResult = await supabase
+      .from(item.sourceTable)
+      .update(fallbackUpdates)
+      .eq("id", item.sourceId)
+      .eq("user_id", item.userId);
+
+    if (fallbackResult.error) {
+      throw fallbackResult.error;
+    }
+  }
+
+  async function saveItemEdit() {
     if (!editingItem) return;
 
     const cleanTitle = editTitle.trim();
+    const cleanContent = editContent.trim();
+    const shouldEditContent = canEditSavedContent(editingItem);
 
     if (!cleanTitle) {
       setError("Title is required.");
+      return;
+    }
+
+    if (shouldEditContent && !cleanContent) {
+      setError("Content is required.");
       return;
     }
 
@@ -643,20 +735,46 @@ export default function SavedNotesPageClient() {
 
     try {
       const { supabase, user } = await getSessionUser();
-      const { error: updateError } = await supabase
-        .from(editingItem.sourceTable)
-        .update({ [getTitleColumn(editingItem)]: cleanTitle })
-        .eq("id", editingItem.sourceId)
-        .eq("user_id", user.id);
+      const contentUpdates = getContentColumnUpdates(editingItem, cleanContent);
+      const savedAt = new Date().toISOString();
+      const timestampUpdate =
+        editingItem.sourceType === "notes" ? { updated_at: savedAt } : {};
+      const updates = {
+        [getTitleColumn(editingItem)]: cleanTitle,
+        ...contentUpdates.full,
+        ...timestampUpdate,
+      };
+      const fallbackUpdates = contentUpdates.fallback
+        ? {
+            [getTitleColumn(editingItem)]: cleanTitle,
+            ...contentUpdates.fallback,
+            ...timestampUpdate,
+          }
+        : null;
 
-      if (updateError) throw updateError;
+      await updateSavedSourceItem(supabase, { ...editingItem, userId: user.id }, updates, fallbackUpdates);
 
-      updateItemInState(editingItem.id, { title: cleanTitle });
+      updateItemInState(editingItem.id, {
+        title: cleanTitle,
+        ...(shouldEditContent
+          ? {
+              content: cleanContent,
+              preview: cleanPreview(cleanContent || editingItem.prompt, 150) || "No preview available.",
+            }
+          : {}),
+        ...(editingItem.sourceType === "notes"
+          ? {
+              savedAt,
+              savedDate: formatDate(savedAt),
+            }
+          : {}),
+      });
       setEditingItem(null);
       setEditTitle("");
-      setMessage("Title updated.");
+      setEditContent("");
+      setMessage(shouldEditContent ? "Saved item updated." : "Title updated.");
     } catch (updateError) {
-      setError(updateError.message || "Could not update title.");
+      setError(updateError.message || "Could not update saved item.");
     } finally {
       setEditingId("");
     }
@@ -786,13 +904,19 @@ export default function SavedNotesPageClient() {
       )}
 
       {editingItem && (
-        <EditTitleModal
+        <EditItemModal
           item={editingItem}
-          value={editTitle}
+          titleValue={editTitle}
+          contentValue={editContent}
           isWorking={editingId === editingItem.id}
-          onChange={setEditTitle}
-          onCancel={() => setEditingItem(null)}
-          onSave={saveTitleEdit}
+          onTitleChange={setEditTitle}
+          onContentChange={setEditContent}
+          onCancel={() => {
+            setEditingItem(null);
+            setEditTitle("");
+            setEditContent("");
+          }}
+          onSave={saveItemEdit}
         />
       )}
 
