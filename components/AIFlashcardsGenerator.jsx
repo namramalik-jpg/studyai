@@ -28,6 +28,16 @@ import Surface from "./ui/Surface";
 const MAX_INPUT_LENGTH = 12000;
 const cardCounts = [10, 20, 30];
 const ratings = ["easy", "medium", "hard"];
+const flashcardActionButtonBase =
+  "study-focus inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-bold leading-tight whitespace-nowrap transition duration-200 [overflow-wrap:normal] [&>svg]:shrink-0 hover:-translate-y-0.5 active:translate-y-0 disabled:pointer-events-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60";
+const flashcardSecondaryActionButtonClass = `${flashcardActionButtonBase} min-w-[7.5rem] border border-border bg-card text-text shadow-sm hover:bg-surface`;
+const flashcardPrimaryActionButtonClass = `${flashcardActionButtonBase} min-w-[7.5rem] bg-primary text-white shadow-sm hover:bg-primary-hover hover:shadow-glow`;
+const flashcardGhostActionButtonClass = `${flashcardActionButtonBase} min-w-[9rem] text-muted hover:bg-surface hover:text-primary`;
+const flashcardActionButtonStyle = {
+  overflowWrap: "normal",
+  whiteSpace: "nowrap",
+  wordBreak: "normal",
+};
 
 function formatRating(value) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -540,19 +550,31 @@ export default function AIFlashcardsGenerator() {
               </Button>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
-              <Button type="button" variant="secondary" onClick={shuffleDeck}>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={shuffleDeck}
+                className={flashcardSecondaryActionButtonClass}
+                style={flashcardActionButtonStyle}
+              >
                 <Shuffle className="h-4 w-4" aria-hidden="true" />
                 Shuffle
-              </Button>
-              <Button type="button" variant="secondary" onClick={restartDeck}>
+              </button>
+              <button
+                type="button"
+                onClick={restartDeck}
+                className={flashcardSecondaryActionButtonClass}
+                style={flashcardActionButtonStyle}
+              >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 Restart
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
                 onClick={saveDeck}
                 disabled={isSaving || Boolean(savedDeckId)}
+                className={flashcardPrimaryActionButtonClass}
+                style={flashcardActionButtonStyle}
               >
                 {isSaving ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -560,12 +582,13 @@ export default function AIFlashcardsGenerator() {
                   <Save className="h-4 w-4" aria-hidden="true" />
                 )}
                 {savedDeckId ? "Saved" : "Save"}
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="secondary"
                 onClick={copyAll}
                 disabled={isCopying}
+                className={flashcardSecondaryActionButtonClass}
+                style={flashcardActionButtonStyle}
               >
                 {isCopying ? (
                   <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -573,15 +596,25 @@ export default function AIFlashcardsGenerator() {
                   <Clipboard className="h-4 w-4" aria-hidden="true" />
                 )}
                 Copy
-              </Button>
-              <Button type="button" variant="secondary" onClick={downloadPdf}>
+              </button>
+              <button
+                type="button"
+                onClick={downloadPdf}
+                className={flashcardSecondaryActionButtonClass}
+                style={flashcardActionButtonStyle}
+              >
                 <Download className="h-4 w-4" aria-hidden="true" />
                 PDF
-              </Button>
-              <Button type="button" variant="ghost" onClick={() => generateDeck()}>
+              </button>
+              <button
+                type="button"
+                onClick={() => generateDeck()}
+                className={flashcardGhostActionButtonClass}
+                style={flashcardActionButtonStyle}
+              >
                 <Layers className="h-4 w-4" aria-hidden="true" />
                 Regenerate
-              </Button>
+              </button>
             </div>
           </div>
         ) : (
