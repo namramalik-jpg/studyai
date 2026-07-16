@@ -121,7 +121,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-[72px] border-b border-border/80 bg-white/80 shadow-sm backdrop-blur-xl transition-colors duration-300 dark:border-white/10 dark:bg-slate-950/75 dark:shadow-[0_12px_40px_rgba(2,6,23,0.35)]">
-      <nav className="relative mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 lg:px-8" aria-label="Primary navigation">
+      <nav className="relative mx-auto flex h-[72px] w-full max-w-[390px] items-center justify-between gap-2 px-3 sm:max-w-7xl sm:gap-4 sm:px-6 lg:px-8" aria-label="Primary navigation">
         <a
           href="#home"
           onClick={() => handleNavClick("#home")}
