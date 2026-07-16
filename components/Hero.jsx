@@ -100,13 +100,16 @@ export default function Hero() {
             AI study workspace for focused learners
           </div>
 
-          <h1 className="mt-4 max-w-3xl text-[clamp(1.95rem,8.8vw,2.25rem)] font-black leading-[1.05] tracking-tight text-text sm:text-[3.2rem] sm:leading-[1.04] lg:text-[3.85rem]">
+          <h1 className="mt-4 max-w-3xl text-[clamp(1.8rem,7.6vw,2.1rem)] font-black leading-[1.08] tracking-tight text-text sm:text-[3.2rem] sm:leading-[1.04] lg:text-[3.85rem]">
             Turn Any Topic Into
             <span className="block bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
               Smart Notes,
             </span>
             {" "}
-            <span className="block">Summaries & Quizzes.</span>
+            <span className="block">
+              <span className="block sm:inline">Summaries &</span>{" "}
+              <span className="block sm:inline">Quizzes.</span>
+            </span>
           </h1>
 
           <p className="mt-4 max-w-xl text-base leading-7 text-muted">
@@ -162,7 +165,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-full min-w-0 studyai-scale-in sm:max-w-[34rem] lg:mx-0 lg:justify-self-end">
+        <div className="relative mx-auto w-full max-w-[22.5rem] min-w-0 studyai-scale-in sm:max-w-[34rem] lg:mx-0 lg:justify-self-end">
           <div className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.18)_0%,rgba(139,92,246,0.12)_34%,transparent_72%)] blur-xl" />
 
           <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 p-2.5 shadow-[0_22px_70px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70 dark:shadow-[0_26px_80px_rgba(2,6,23,0.48)] sm:p-3">

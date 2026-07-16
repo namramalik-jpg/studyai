@@ -1,7 +1,6 @@
 "use client";
 
 import { BookOpenText, Bot, GraduationCap, Heart } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import ScrollReveal from "./ScrollReveal";
 
 const stats = [
@@ -36,70 +35,9 @@ const stats = [
 ];
 
 function AnimatedNumber({ value, suffix }) {
-  const [displayValue, setDisplayValue] = useState(value);
-  const numberRef = useRef(null);
-  const hasAnimated = useRef(false);
-  const frameRef = useRef(0);
-  const finalTimerRef = useRef(0);
-
-  useEffect(() => {
-    const element = numberRef.current;
-
-    if (!element) {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting || hasAnimated.current) {
-          return;
-        }
-
-        hasAnimated.current = true;
-        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        const duration = 1100;
-        const start = performance.now();
-        if (prefersReducedMotion) {
-          setDisplayValue(value);
-          observer.disconnect();
-          return;
-        }
-
-        setDisplayValue(0);
-
-        function animateNumber(timestamp) {
-          const progress = Math.min((timestamp - start) / duration, 1);
-          const easedProgress = 1 - Math.pow(1 - progress, 3);
-
-          setDisplayValue(Math.round(value * easedProgress));
-
-          if (progress < 1) {
-            frameRef.current = requestAnimationFrame(animateNumber);
-          } else {
-            setDisplayValue(value);
-          }
-        }
-
-        frameRef.current = requestAnimationFrame(animateNumber);
-        finalTimerRef.current = window.setTimeout(() => setDisplayValue(value), duration + 150);
-        observer.disconnect();
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frameRef.current);
-      window.clearTimeout(finalTimerRef.current);
-    };
-  }, [value]);
-
   return (
-    <span ref={numberRef}>
-      {displayValue}
+    <span>
+      {value}
       {suffix}
     </span>
   );
