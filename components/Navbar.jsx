@@ -121,17 +121,17 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-[72px] border-b border-border/80 bg-white/80 shadow-sm backdrop-blur-xl transition-colors duration-300 dark:border-white/10 dark:bg-slate-950/75 dark:shadow-[0_12px_40px_rgba(2,6,23,0.35)]">
-      <nav className="relative mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8" aria-label="Primary navigation">
+      <nav className="relative mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6 lg:px-8" aria-label="Primary navigation">
         <a
           href="#home"
           onClick={() => handleNavClick("#home")}
-          className="group flex min-w-0 items-center gap-3 rounded-2xl study-focus"
+          className="group flex min-w-0 items-center gap-2 rounded-2xl study-focus sm:gap-3"
           aria-label="StudyAI home"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:bg-primary-hover">
             <Sparkles className="h-5 w-5" aria-hidden="true" />
           </span>
-          <span className="truncate text-lg font-black tracking-normal text-text">
+          <span className="truncate text-base font-black tracking-normal text-text sm:text-lg">
             StudyAI
           </span>
         </a>
@@ -159,7 +159,7 @@ export default function Navbar() {
           })}
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={toggleTheme}

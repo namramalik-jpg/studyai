@@ -36,9 +36,11 @@ const stats = [
 ];
 
 function AnimatedNumber({ value, suffix }) {
-  const [displayValue, setDisplayValue] = useState(0);
+  const [displayValue, setDisplayValue] = useState(value);
   const numberRef = useRef(null);
   const hasAnimated = useRef(false);
+  const frameRef = useRef(0);
+  const finalTimerRef = useRef(0);
 
   useEffect(() => {
     const element = numberRef.current;
@@ -56,14 +58,15 @@ function AnimatedNumber({ value, suffix }) {
         hasAnimated.current = true;
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+        const duration = 1100;
+        const start = performance.now();
         if (prefersReducedMotion) {
           setDisplayValue(value);
           observer.disconnect();
           return;
         }
 
-        const duration = 1100;
-        const start = performance.now();
+        setDisplayValue(0);
 
         function animateNumber(timestamp) {
           const progress = Math.min((timestamp - start) / duration, 1);
@@ -72,11 +75,14 @@ function AnimatedNumber({ value, suffix }) {
           setDisplayValue(Math.round(value * easedProgress));
 
           if (progress < 1) {
-            requestAnimationFrame(animateNumber);
+            frameRef.current = requestAnimationFrame(animateNumber);
+          } else {
+            setDisplayValue(value);
           }
         }
 
-        requestAnimationFrame(animateNumber);
+        frameRef.current = requestAnimationFrame(animateNumber);
+        finalTimerRef.current = window.setTimeout(() => setDisplayValue(value), duration + 150);
         observer.disconnect();
       },
       { threshold: 0.35 }
@@ -84,7 +90,11 @@ function AnimatedNumber({ value, suffix }) {
 
     observer.observe(element);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frameRef.current);
+      window.clearTimeout(finalTimerRef.current);
+    };
   }, [value]);
 
   return (

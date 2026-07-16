@@ -117,11 +117,11 @@ export default function AIWorkspaceShowcase() {
           </p>
         </ScrollReveal>
 
-        <ScrollReveal delay="delay-150" className="mx-auto mt-12 max-w-6xl">
-          <div className="relative">
+        <ScrollReveal delay="delay-150" className="mx-auto mt-12 w-full max-w-6xl">
+          <div className="relative w-full max-w-full overflow-hidden rounded-[2rem]">
             <div className="pointer-events-none absolute -inset-8 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.18)_0%,rgba(139,92,246,0.11)_38%,transparent_72%)] blur-2xl" />
 
-            <div className="landing-card relative overflow-hidden shadow-[0_28px_90px_rgba(15,23,42,0.12)]">
+            <div className="landing-card relative w-full max-w-full overflow-hidden shadow-[0_28px_90px_rgba(15,23,42,0.12)]">
               <div className="flex items-center justify-between border-b border-slate-200/80 bg-white/85 px-4 py-3 sm:px-5">
                 <div className="flex items-center gap-2">
                   <span className="h-3 w-3 rounded-full bg-red-400" />
@@ -141,7 +141,7 @@ export default function AIWorkspaceShowcase() {
                 </button>
               </div>
 
-              <div className="grid min-h-[34rem] lg:grid-cols-[14rem_1fr_18rem]">
+              <div className="grid min-h-[34rem] w-full min-w-0 lg:grid-cols-[14rem_1fr_18rem]">
                 <aside className="border-b border-slate-200 bg-slate-50/80 p-4 lg:border-b-0 lg:border-r">
                   <div className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-sm">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
@@ -192,7 +192,7 @@ export default function AIWorkspaceShowcase() {
                   </div>
                 </aside>
 
-                <div className="bg-white p-4 sm:p-5 lg:p-6">
+                <div className="min-w-0 bg-white p-4 sm:p-5 lg:p-6">
                   <div className="rounded-[1.35rem] border border-slate-200 bg-slate-50 p-3 shadow-inner">
                     <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
                       <div className="min-w-0 flex-1">
@@ -213,7 +213,7 @@ export default function AIWorkspaceShowcase() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid gap-4 xl:grid-cols-[1fr_0.78fr]">
+                  <div className="mt-5 grid min-w-0 gap-4 xl:grid-cols-[1fr_0.78fr]">
                     <div className="rounded-[1.35rem] border border-slate-200 bg-white p-5 shadow-[0_14px_38px_rgba(15,23,42,0.07)]">
                       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -249,7 +249,7 @@ export default function AIWorkspaceShowcase() {
                       </div>
                     </div>
 
-                    <div className="grid gap-4">
+                    <div className="grid min-w-0 gap-4">
                       <div className="rounded-[1.35rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-[0_16px_45px_rgba(15,23,42,0.16)]">
                         <div className="flex items-center justify-between gap-3">
                           <div>
@@ -297,7 +297,7 @@ export default function AIWorkspaceShowcase() {
                   </div>
                 </div>
 
-                <aside className="grid gap-4 border-t border-slate-200 bg-slate-50/80 p-4 lg:border-l lg:border-t-0">
+                <aside className="grid min-w-0 gap-4 border-t border-slate-200 bg-slate-50/80 p-4 lg:border-l lg:border-t-0">
                   {sideCards.map((card) => {
                     const Icon = card.icon;
 

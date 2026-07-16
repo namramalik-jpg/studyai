@@ -93,18 +93,19 @@ export default function Hero() {
       <div className="pointer-events-none absolute right-[14%] bottom-12 h-20 w-20 rounded-full bg-violet-400/10 blur-2xl animate-pulse-glow" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-9 px-4 pb-10 sm:px-6 sm:pb-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:px-8 lg:pb-14">
-        <div className="studyai-fade-in">
+      <div className="relative mx-auto grid w-full max-w-7xl items-center gap-9 px-4 pb-10 sm:px-6 sm:pb-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:px-8 lg:pb-14">
+        <div className="min-w-0 studyai-fade-in">
           <div className="landing-eyebrow">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             AI study workspace for focused learners
           </div>
 
-          <h1 className="mt-4 max-w-3xl text-[2.45rem] font-black leading-[1.04] tracking-tight text-text sm:text-[3.2rem] lg:text-[3.85rem]">
+          <h1 className="mt-4 max-w-3xl text-[clamp(1.95rem,8.8vw,2.25rem)] font-black leading-[1.05] tracking-tight text-text sm:text-[3.2rem] sm:leading-[1.04] lg:text-[3.85rem]">
             Turn Any Topic Into
             <span className="block bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
               Smart Notes,
             </span>
+            {" "}
             <span className="block">Summaries & Quizzes.</span>
           </h1>
 
@@ -161,7 +162,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-[34rem] studyai-scale-in lg:mx-0 lg:justify-self-end">
+        <div className="relative mx-auto w-full max-w-full min-w-0 studyai-scale-in sm:max-w-[34rem] lg:mx-0 lg:justify-self-end">
           <div className="pointer-events-none absolute -inset-6 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.18)_0%,rgba(139,92,246,0.12)_34%,transparent_72%)] blur-xl" />
 
           <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/85 p-2.5 shadow-[0_22px_70px_rgba(15,23,42,0.14)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/70 dark:shadow-[0_26px_80px_rgba(2,6,23,0.48)] sm:p-3">
