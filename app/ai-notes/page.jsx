@@ -1,10 +1,12 @@
 import AINotesGenerator from "@/components/AINotesGenerator";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AI Notes - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "AI Notes",
   description: "Generate Gemini-powered study notes and save them to StudyAI.",
-};
+  path: "/ai-notes",
+});
 
 export default function AINotesPage() {
   return (
