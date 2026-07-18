@@ -1,10 +1,12 @@
 import AIChatPageClient from "@/components/AIChatPageClient";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AI Chat - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "AI Chat",
   description: "Chat with StudyAI and save your conversations securely.",
-};
+  path: "/chat",
+});
 
 export default function ChatPage() {
   return (
