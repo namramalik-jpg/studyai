@@ -1,5 +1,12 @@
 import DashboardShell from "@/components/DashboardShell";
 import SummaryList from "@/components/SummaryList";
+import { buildNoIndexMetadata } from "@/lib/seo";
+
+export const metadata = buildNoIndexMetadata({
+  title: "Saved Summaries",
+  description: "Review saved StudyAI summaries.",
+  path: "/summaries",
+});
 
 export default function SummariesPage() {
   return (
