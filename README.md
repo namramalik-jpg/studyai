@@ -2,7 +2,12 @@
 
 StudyAI is a modern AI-powered study platform built with Next.js, Supabase, and Google Gemini. It helps students generate study notes, summaries, quizzes, and flashcards from any topic or study material.
 
-Live Demo: https://study-ai-sandy-mu.vercel.app/
+Live Demo: https://study-ai.mumar.dev/
+
+## Project roles
+
+- **Product direction, product brief, acceptance criteria, and review:** Umar Farooq
+- **Engineering implementation:** Completed by the project team.
 
 ## Overview
 
@@ -62,7 +67,7 @@ The project is suitable for a Final Year Project, portfolio showcase, and future
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/namramalik-jpg/studyai.git
+git clone https://github.com/mumar20/studyai.git
 cd studyai
 ```
 
@@ -156,7 +161,7 @@ The project is deployed on Vercel.
 Production URL:
 
 ```txt
-https://study-ai-sandy-mu.vercel.app/
+https://study-ai.mumar.dev/
 ```
 
 Before deploying, add the required environment variables in Vercel:
