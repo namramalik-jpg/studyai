@@ -1,10 +1,12 @@
 import AdminDashboardClient from "@/components/AdminDashboardClient";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Admin Dashboard - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "Admin Dashboard",
   description: "Manage StudyAI users and platform analytics.",
-};
+  path: "/admin",
+});
 
 export default function AdminPage() {
   return (

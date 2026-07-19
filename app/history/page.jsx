@@ -1,10 +1,12 @@
 import AIHistoryPageClient from "@/components/AIHistoryPageClient";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AI History - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "AI History",
   description: "Search, filter, reuse, and manage previous StudyAI generations.",
-};
+  path: "/history",
+});
 
 export default function HistoryPage() {
   return (

@@ -1,5 +1,12 @@
 import DashboardShell from "@/components/DashboardShell";
 import ProfilePageClient from "@/components/ProfilePageClient";
+import { buildNoIndexMetadata } from "@/lib/seo";
+
+export const metadata = buildNoIndexMetadata({
+  title: "Profile",
+  description: "Manage your StudyAI profile and account details.",
+  path: "/profile",
+});
 
 export default function ProfilePage() {
   return (

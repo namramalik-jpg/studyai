@@ -1,10 +1,12 @@
 import AISummaryGenerator from "@/components/AISummaryGenerator";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AI Summary - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "AI Summary",
   description: "Summarize long study material with Gemini-powered AI.",
-};
+  path: "/ai-summary",
+});
 
 export default function AISummaryPage() {
   return (

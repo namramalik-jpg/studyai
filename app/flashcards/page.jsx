@@ -1,10 +1,12 @@
 import AIFlashcardsGenerator from "@/components/AIFlashcardsGenerator";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Flashcards - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "Flashcards",
   description: "Generate interactive Gemini-powered flashcards from any topic or notes.",
-};
+  path: "/flashcards",
+});
 
 export default function FlashcardsPage() {
   return (

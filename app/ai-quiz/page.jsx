@@ -1,10 +1,12 @@
 import AIQuizGenerator from "@/components/AIQuizGenerator";
 import DashboardShell from "@/components/DashboardShell";
+import { buildNoIndexMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "AI Quiz - StudyAI",
+export const metadata = buildNoIndexMetadata({
+  title: "AI Quiz",
   description: "Generate interactive Gemini-powered quizzes from any topic or notes.",
-};
+  path: "/ai-quiz",
+});
 
 export default function AIQuizPage() {
   return (
